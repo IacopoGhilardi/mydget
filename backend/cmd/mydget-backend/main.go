@@ -1,14 +1,21 @@
 package main
 
 import (
-	"fmt"
-	"net/http"
+	"log"
+
+	"github.com/gin-gonic/gin"
+	"github.com/iacopoghilardi/mydget-backend/internals/bootstrap"
+	"github.com/iacopoghilardi/mydget-backend/internals/routes"
 )
 
 func main() {
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintf(w, "Hello, Mydget!")
-	})
+	app, err := bootstrap.NewApplication()
+	if err != nil {
+		log.Fatal("Failed to initialize application: ", err)
+	}
 
-	http.ListenAndServe(":8080", nil)
+	r := gin.Default()
+
+	routes.SetupRoutes(r, app.Handlers)
+	r.Run(":8080")
 }
