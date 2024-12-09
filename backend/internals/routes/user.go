@@ -5,7 +5,7 @@ import (
 	"github.com/iacopoghilardi/mydget-backend/internals/handlers"
 )
 
-func SetupUserRoutes(r *gin.Engine, handler *handlers.UserHandler) {
+func SetupUserRoutes(r *gin.RouterGroup, handler *handlers.UserHandler) {
 	r.GET("/users", handler.GetAll)
 	r.POST("/users", handler.Create)
 	r.GET("/users/:id", handler.GetById)

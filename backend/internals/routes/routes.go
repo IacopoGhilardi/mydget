@@ -1,15 +1,20 @@
 package routes
 
 import (
+	"net/http"
+
 	"github.com/gin-gonic/gin"
 	"github.com/iacopoghilardi/mydget-backend/internals/bootstrap"
+	"github.com/iacopoghilardi/mydget-backend/utils"
 )
 
 func SetupRoutes(r *gin.Engine, handlers *bootstrap.Handlers) {
-	r.GET("/health", func(c *gin.Context) {
-		c.String(200, "OK")
+	r.GET("/healthcheck", func(c *gin.Context) {
+		c.JSON(http.StatusOK, utils.BuildSuccessResponse("OK"))
 	})
 
-	SetupUserRoutes(r, handlers.UserHandler)
-	RegisterAuthRoutes(r.Group("/auth"), handlers.AuthHandler)
+	v1 := r.Group("/api/v1")
+
+	SetupUserRoutes(v1, handlers.UserHandler)
+	RegisterAuthRoutes(v1.Group("/auth"), handlers.AuthHandler)
 }
