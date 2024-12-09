@@ -1,10 +1,13 @@
 package services
 
 import (
+	"errors"
+
 	"github.com/iacopoghilardi/mydget-backend/internals/mappers"
 	"github.com/iacopoghilardi/mydget-backend/internals/models"
 	"github.com/iacopoghilardi/mydget-backend/internals/repositories"
 	"github.com/iacopoghilardi/mydget-backend/internals/types/dto"
+	"github.com/iacopoghilardi/mydget-backend/utils"
 )
 
 type AuthService struct {
@@ -26,8 +29,24 @@ func (a *AuthService) Register(user *dto.RegisterUserDto) (*models.User, error) 
 	return createdUser, nil
 }
 
-func (a *AuthService) Login(user *models.User) (*models.User, error) {
-	return nil, nil
+func (a *AuthService) Login(user *dto.LoginUserDto) (string, error) {
+	userModel := mappers.LoginUserDtoToUserModel(user)
+
+	foundUser, err := a.userRepository.FindByEmail(userModel.Email)
+	if err != nil {
+		return "", errors.New("user not found")
+	}
+
+	if !utils.VerifyPassword(userModel.Password, foundUser.Password) {
+		return "", errors.New("invalid credentials")
+	}
+
+	token, err := utils.GenerateJWT(foundUser.Email)
+	if err != nil {
+		return "", errors.New("failed to generate JWT")
+	}
+
+	return token, nil
 }
 
 func (a *AuthService) ResetPassword(user *models.User) (*models.User, error) {

@@ -24,3 +24,10 @@ func GetUserDtoFromCreateUserDto(dto *dto.CreateUserDto) models.User {
 func RegisterUserDtoToUserModel(dto *dto.RegisterUserDto) models.User {
 	return GetUserDtoFromCreateUserDto(&dto.CreateUserDto)
 }
+
+func LoginUserDtoToUserModel(dto *dto.LoginUserDto) *models.User {
+	return &models.User{
+		Email:    dto.Email,
+		Password: dto.Password,
+	}
+}

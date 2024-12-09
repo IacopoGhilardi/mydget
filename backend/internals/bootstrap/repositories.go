@@ -7,12 +7,10 @@ import (
 
 type Repositories struct {
 	UserRepository *repositories.UserRepository
-	// Altri repository qui
 }
 
 func SetupRepositories() *Repositories {
 	return &Repositories{
 		UserRepository: repositories.NewUserRepository(db.GetDB()),
-		// Inizializza altri repository
 	}
 }

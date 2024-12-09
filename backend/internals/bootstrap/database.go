@@ -16,7 +16,6 @@ func SetupDatabase() error {
 	if err := db.Connect(); err != nil {
 		log.Fatal("Failed to connect to database: ", err)
 	}
-	defer db.Close()
 
 	if err := db.Ping(); err != nil {
 		log.Fatal("Failed to connect to database: ", err)

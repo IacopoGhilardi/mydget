@@ -2,9 +2,14 @@ package main
 
 import (
 	"log"
+	"os"
+	"os/signal"
+	"syscall"
 
 	"github.com/gin-gonic/gin"
 	"github.com/iacopoghilardi/mydget-backend/internals/bootstrap"
+	"github.com/iacopoghilardi/mydget-backend/internals/config"
+	"github.com/iacopoghilardi/mydget-backend/internals/db"
 	"github.com/iacopoghilardi/mydget-backend/internals/routes"
 )
 
@@ -15,7 +20,20 @@ func main() {
 	}
 
 	r := gin.Default()
-
 	routes.SetupRoutes(r, app.Handlers)
-	r.Run(":8080")
+
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+	go func() {
+		<-quit
+		log.Println("Shutting down server...")
+
+		if err := db.Close(); err != nil {
+			log.Fatal("Failed to close database connection: ", err)
+		}
+
+		os.Exit(0)
+	}()
+
+	r.Run(":" + config.GetConfig().BackendPort)
 }

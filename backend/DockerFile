@@ -1,0 +1,32 @@
+# Build stage
+FROM golang:1.22.5-alpine AS builder
+
+# Imposta la directory di lavoro
+WORKDIR /app
+
+COPY go.mod go.sum ./ 
+
+COPY .env ./app
+
+# Copia il codice sorgente
+COPY . .
+
+# Scarica le dipendenze
+RUN go mod download
+
+# Compila l'applicazione
+RUN CGO_ENABLED=0 GOOS=linux go build -o mydget-backend ./cmd/mydget-backend
+
+# Final stage
+FROM alpine:latest
+
+# Copia il binario compilato dal builder stage
+COPY --from=builder /app/mydget-backend .
+# Copia il file .env
+COPY --from=builder /app/.env .
+
+# Espose la porta 8080
+EXPOSE 8080
+
+# Comando per eseguire l'applicazione
+CMD ["./mydget-backend"]

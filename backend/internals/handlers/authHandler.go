@@ -19,13 +19,34 @@ func NewAuthHandler(authService *services.AuthService) *AuthHandler {
 }
 
 func (a *AuthHandler) Login(c *gin.Context) {
+	var dto dto.LoginUserDto
+	if err := c.ShouldBindJSON(&dto); err != nil {
+		c.JSON(http.StatusBadRequest, utils.BuildErrorResponse(
+			"Bad Request",
+			err.Error(),
+		))
+		return
+	}
 
+	token, err := a.authService.Login(&dto)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, utils.BuildErrorResponse(
+			"Internal Server Error",
+			err.Error(),
+		))
+		return
+	}
+
+	c.JSON(http.StatusOK, utils.BuildSuccessResponse(token))
 }
 
 func (a *AuthHandler) Register(c *gin.Context) {
 	var dto dto.RegisterUserDto
 	if err := c.ShouldBindJSON(&dto); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, utils.BuildErrorResponse(
+			"Bad Request",
+			err.Error(),
+		))
 		return
 	}
 

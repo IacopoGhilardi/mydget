@@ -2,6 +2,7 @@ package db
 
 import (
 	"fmt"
+	"log"
 
 	"github.com/iacopoghilardi/mydget-backend/internals/config"
 	"github.com/iacopoghilardi/mydget-backend/internals/models"
@@ -15,9 +16,11 @@ func Connect() error {
 	config := config.GetConfig()
 	db, err := gorm.Open(postgres.Open(fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable", config.DBHost, config.DBUser, config.DBPassword, config.DBName, config.DBPort)), &gorm.Config{})
 	if err != nil {
+		log.Println("Failed to connect to database: ", err)
 		return err
 	}
 	DB = db
+	log.Println("Connected to database")
 	return nil
 }
 
