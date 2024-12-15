@@ -14,9 +14,11 @@ type CreateUserDto struct {
 }
 
 type UpdateUserDto struct {
+	ID        uint   `json:"id" binding:"required"`
 	FirstName string `json:"first_name,omitempty"`
 	LastName  string `json:"last_name,omitempty"`
 	Email     string `json:"email,omitempty"`
+	Password  string `json:"password,omitempty"`
 }
 
 type LoginUserDto struct {

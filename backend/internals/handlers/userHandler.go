@@ -1,11 +1,12 @@
 package handlers
 
 import (
+	"fmt"
+	"log"
 	"net/http"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
-	"github.com/iacopoghilardi/mydget-backend/internals/models"
 	"github.com/iacopoghilardi/mydget-backend/internals/services"
 	"github.com/iacopoghilardi/mydget-backend/internals/types/dto"
 	"github.com/iacopoghilardi/mydget-backend/pkg/validation"
@@ -52,6 +53,7 @@ func (h *UserHandler) Create(c *gin.Context) {
 
 	user, err := h.userService.Create(&dto)
 	if err != nil {
+		fmt.Printf("err: %+v\n", err)
 		c.JSON(http.StatusInternalServerError, utils.BuildErrorResponse(
 			"Internal Server Error",
 			err.Error(),
@@ -84,18 +86,38 @@ func (h *UserHandler) GetById(c *gin.Context) {
 
 func (h *UserHandler) Update(c *gin.Context) {
 	var dto dto.UpdateUserDto
-	if err := c.ShouldBindJSON(&dto); err != nil {
+
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		log.Printf("error getting id from param: %+v\n", err)
 		c.JSON(http.StatusBadRequest, utils.BuildErrorResponse(
 			"Bad Request",
 			err.Error(),
 		))
 		return
 	}
-	user, err := h.userService.Update(models.User{
-		FirstName: dto.FirstName,
-		LastName:  dto.LastName,
-		Email:     dto.Email,
-	})
+
+	dto.ID = uint(id)
+
+	if err := c.ShouldBindJSON(&dto); err != nil {
+		log.Printf("error binding json on update user: %+v\n", err)
+		c.JSON(http.StatusBadRequest, utils.BuildErrorResponse(
+			"Bad Request",
+			err.Error(),
+		))
+		return
+	}
+
+	if err := validation.ValidateUpdateUserDto(&dto); err != nil {
+		log.Printf("error validating update user dto: %+v\n", err)
+		c.JSON(http.StatusBadRequest, utils.BuildErrorResponse(
+			"Bad Request",
+			err.Error(),
+		))
+		return
+	}
+
+	user, err := h.userService.Update(dto)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, utils.BuildErrorResponse(
 			"Internal Server Error",

@@ -2,6 +2,7 @@ package validation
 
 import (
 	"errors"
+	"log"
 
 	"github.com/iacopoghilardi/mydget-backend/internals/types/dto"
 	"github.com/iacopoghilardi/mydget-backend/utils"
@@ -60,5 +61,20 @@ func ValidateCreateUserDto(dto *dto.CreateUserDto) error {
 }
 
 func ValidateUpdateUserDto(dto *dto.UpdateUserDto) error {
+	if dto.ID == 0 {
+		return errors.New("id is required")
+	}
+
+	if dto.Email != "" && !utils.IsEmailValid(dto.Email) {
+		return errors.New("invalid email")
+	}
+
+	passwordValidator := NewPasswordValidator()
+
+	if err := passwordValidator.Validate(dto.Password); err != nil {
+		log.Printf("error validating password: %+v\n", err)
+		return err
+	}
+
 	return nil
 }

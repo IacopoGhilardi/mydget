@@ -6,6 +6,7 @@ import (
 	"github.com/iacopoghilardi/mydget-backend/internals/models"
 	"github.com/iacopoghilardi/mydget-backend/internals/types/dto"
 	"github.com/iacopoghilardi/mydget-backend/utils"
+	"gorm.io/gorm"
 )
 
 func GetUserDtoFromCreateUserDto(dto *dto.CreateUserDto) models.User {
@@ -29,5 +30,17 @@ func LoginUserDtoToUserModel(dto *dto.LoginUserDto) *models.User {
 	return &models.User{
 		Email:    dto.Email,
 		Password: dto.Password,
+	}
+}
+
+func UpdateUserDtoToUserModel(dto *dto.UpdateUserDto) models.User {
+	return models.User{
+		Model: gorm.Model{
+			ID: dto.ID,
+		},
+		FirstName: dto.FirstName,
+		LastName:  dto.LastName,
+		Email:     dto.Email,
+		Password:  dto.Password,
 	}
 }

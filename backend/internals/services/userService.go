@@ -1,6 +1,9 @@
 package services
 
 import (
+	"fmt"
+	"log"
+
 	"github.com/iacopoghilardi/mydget-backend/internals/db"
 	"github.com/iacopoghilardi/mydget-backend/internals/mappers"
 	"github.com/iacopoghilardi/mydget-backend/internals/models"
@@ -8,9 +11,7 @@ import (
 	"github.com/iacopoghilardi/mydget-backend/internals/types/dto"
 )
 
-var databaseInstance = db.GetDB()
-
-var userRepository = repositories.NewUserRepository(databaseInstance)
+var userRepository = repositories.NewUserRepository(db.GetDB())
 
 type UserService struct {
 	userRepository *repositories.UserRepository
@@ -39,16 +40,35 @@ func (s *UserService) GetById(id int) (models.User, error) {
 func (s *UserService) Create(user *dto.CreateUserDto) (models.User, error) {
 	userModel := mappers.GetUserDtoFromCreateUserDto(user)
 
-	err := databaseInstance.Create(&userModel).Error
+	fmt.Printf("userModel: %+v\n", userModel)
+
+	err := db.GetDB().Create(&userModel).Error
 	if err != nil {
+		fmt.Printf("err: %+v\n", err)
 		return models.User{}, err
 	}
+
+	fmt.Printf("userModel: %+v\n", userModel)
 
 	return userModel, nil
 }
 
-func (s *UserService) Update(user models.User) (models.User, error) {
-	return user, nil
+func (s *UserService) Update(user dto.UpdateUserDto) (models.User, error) {
+	userModel := mappers.UpdateUserDtoToUserModel(&user)
+
+	oldUser, err := s.userRepository.FindById(int(user.ID))
+	if err != nil {
+		log.Printf("error finding user: %+v\n", err)
+		return models.User{}, err
+	}
+
+	updatedUser, err := s.userRepository.Update(oldUser, &userModel)
+	if err != nil {
+		log.Printf("error updating user: %+v\n", err)
+		return models.User{}, err
+	}
+
+	return *updatedUser, nil
 }
 
 func (s *UserService) Delete(id int) error {
