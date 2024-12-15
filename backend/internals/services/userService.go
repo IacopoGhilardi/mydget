@@ -72,5 +72,10 @@ func (s *UserService) Update(user dto.UpdateUserDto) (models.User, error) {
 }
 
 func (s *UserService) Delete(id int) error {
+	err := s.userRepository.Delete(id)
+	if err != nil {
+		log.Printf("error deleting user: %+v\n", err)
+		return err
+	}
 	return nil
 }

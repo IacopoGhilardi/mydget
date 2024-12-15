@@ -74,5 +74,9 @@ func (r *UserRepository) Update(oldUser *models.User, user *models.User) (*model
 }
 
 func (r *UserRepository) Delete(id int) error {
-	return r.db.Delete(&models.User{}, id).Error
+	err := r.db.Delete(&models.User{}, id).Error
+	if err != nil {
+		return err
+	}
+	return nil
 }
