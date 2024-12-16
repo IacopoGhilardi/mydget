@@ -3,12 +3,15 @@ package routes
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/iacopoghilardi/mydget-backend/internals/handlers"
+	"github.com/iacopoghilardi/mydget-backend/internals/routes/middlewares"
 )
 
 func SetupUserRoutes(r *gin.RouterGroup, handler *handlers.UserHandler) {
-	r.GET("/users", handler.GetAll)
-	r.POST("/users", handler.Create)
-	r.GET("/users/:id", handler.GetById)
-	r.PUT("/users/:id", handler.Update)
-	r.DELETE("/users/:id", handler.Delete)
+	r.Use(middlewares.AuthMiddleware())
+
+	r.GET("/", handler.GetAll)
+	r.POST("/", handler.Create)
+	r.GET("/:id", handler.GetById)
+	r.PUT("/:id", handler.Update)
+	r.DELETE("/:id", handler.Delete)
 }

@@ -32,16 +32,16 @@ func (a *AuthService) Register(user *dto.RegisterUserDto) (*models.User, error) 
 func (a *AuthService) Login(user *dto.LoginUserDto) (string, error) {
 	userModel := mappers.LoginUserDtoToUserModel(user)
 
-	foundUser, err := a.userRepository.FindByEmail(userModel.Email)
+	existingUser, err := a.userRepository.FindByEmail(userModel.Email)
 	if err != nil {
 		return "", errors.New("user not found")
 	}
 
-	if !utils.VerifyPassword(userModel.Password, foundUser.Password) {
+	if !utils.VerifyPassword(existingUser.Password, userModel.Password) {
 		return "", errors.New("invalid credentials")
 	}
 
-	token, err := utils.GenerateJWT(foundUser.Email)
+	token, err := utils.GenerateJWT(existingUser.UUID)
 	if err != nil {
 		return "", errors.New("failed to generate JWT")
 	}

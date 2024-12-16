@@ -1,23 +1,25 @@
 package utils
 
 import (
+	"errors"
 	"fmt"
+	"log"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
 )
 
-var jwtKey = []byte("your_secret_key")
+var jwtKey = []byte("mydget_secret_key")
 
 type Claims struct {
-	Username string `json:"username"`
+	UUID string `json:"uuid"`
 	jwt.RegisteredClaims
 }
 
-func GenerateJWT(username string) (string, error) {
+func GenerateJWT(uuid string) (string, error) {
 	expirationTime := time.Now().Add(24 * time.Hour)
 	claims := &Claims{
-		Username: username,
+		UUID: uuid,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(expirationTime),
 		},
@@ -26,6 +28,7 @@ func GenerateJWT(username string) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	tokenString, err := token.SignedString(jwtKey)
 	if err != nil {
+		log.Printf("Error generating JWT: %v", err)
 		return "", err
 	}
 
@@ -40,10 +43,17 @@ func VerifyJWT(tokenString string) (*Claims, error) {
 	})
 
 	if err != nil {
+		if err == jwt.ErrSignatureInvalid {
+			log.Printf("Invalid token signature")
+			return nil, errors.New("invalid token signature")
+		}
+
+		log.Printf("Error parsing JWT: %v", err)
 		return nil, err
 	}
 
 	if !token.Valid {
+		log.Printf("Invalid token")
 		return nil, fmt.Errorf("invalid token")
 	}
 

@@ -12,6 +12,7 @@ type User struct {
 	LastName  string   `gorm:"size:255; column:last_name" json:"last_name"`
 	Email     string   `gorm:"uniqueIndex;size:255; column:email" json:"email"`
 	Password  string   `gorm:"size:255; column:password" json:"password"`
+	UUID      string   `gorm:"uniqueIndex;size:255; column:uuid" json:"uuid"`
 	Profile   *Profile `gorm:"foreignKey:UserID" json:"profile"`
 }
 

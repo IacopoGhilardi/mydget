@@ -15,6 +15,6 @@ func SetupRoutes(r *gin.Engine, handlers *bootstrap.Handlers) {
 
 	v1 := r.Group("/api/v1")
 
-	SetupUserRoutes(v1, handlers.UserHandler)
+	SetupUserRoutes(v1.Group("/users"), handlers.UserHandler)
 	RegisterAuthRoutes(v1.Group("/auth"), handlers.AuthHandler)
 }

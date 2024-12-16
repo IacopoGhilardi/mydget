@@ -49,6 +49,15 @@ func (r *UserRepository) FindById(id int) (*models.User, error) {
 	return &user, nil
 }
 
+func (r *UserRepository) FindByUUID(uuid string) (*models.User, error) {
+	var user models.User
+	err := r.db.Where("uuid = ?", uuid).First(&user).Error
+	if err != nil {
+		return nil, err
+	}
+	return &user, nil
+}
+
 func (r *UserRepository) Update(oldUser *models.User, user *models.User) (*models.User, error) {
 	if user.FirstName != "" && user.FirstName != oldUser.FirstName {
 		oldUser.FirstName = user.FirstName
@@ -59,7 +68,7 @@ func (r *UserRepository) Update(oldUser *models.User, user *models.User) (*model
 	if user.Email != "" && user.Email != oldUser.Email {
 		oldUser.Email = user.Email
 	}
-	if user.Password != "" && !utils.ComparePassword(user.Password, oldUser.Password) {
+	if user.Password != "" && !utils.VerifyPassword(user.Password, oldUser.Password) {
 		hashedPassword, err := utils.HashPassword(user.Password)
 		if err != nil {
 			return nil, err
