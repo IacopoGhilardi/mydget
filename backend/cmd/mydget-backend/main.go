@@ -35,5 +35,6 @@ func main() {
 		os.Exit(0)
 	}()
 
+	log.Println("Server is running on port: ", config.GetConfig().BackendPort)
 	r.Run(":" + config.GetConfig().BackendPort)
 }
