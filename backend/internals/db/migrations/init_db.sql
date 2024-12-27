@@ -36,6 +36,11 @@ CREATE TABLE IF NOT EXISTS profiles (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     deleted_at TIMESTAMP,
+    first_name VARCHAR(255),
+    last_name VARCHAR(255),
+    birth_date DATE,
+    avatar VARCHAR(255),
+    bio TEXT,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 

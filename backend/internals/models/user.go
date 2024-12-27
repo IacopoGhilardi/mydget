@@ -2,6 +2,7 @@ package models
 
 import (
 	"errors"
+	"time"
 
 	"gorm.io/gorm"
 )
@@ -42,4 +43,8 @@ func (u *User) validate() error {
 		return errors.New("email cannot be empty")
 	}
 	return nil
+}
+
+func (u *User) isProfileCompleted() bool {
+	return u.Profile != nil && u.Profile.FirstName != "" && u.Profile.LastName != "" && u.Profile.BirthDate != time.Time{}
 }
