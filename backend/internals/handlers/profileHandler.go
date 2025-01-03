@@ -50,7 +50,7 @@ func (h *ProfileHandler) CreateProfile(c *gin.Context) {
 		return
 	}
 
-	profile, err := h.profileService.CreateProfile(dto)
+	profile, err := h.profileService.Create(dto)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, utils.BuildErrorResponse(
 			"Internal Server Error",

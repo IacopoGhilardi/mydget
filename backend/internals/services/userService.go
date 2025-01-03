@@ -11,8 +11,6 @@ import (
 	"github.com/iacopoghilardi/mydget-backend/internals/types/dto"
 )
 
-var userRepository = repositories.NewUserRepository(db.GetDB())
-
 type UserService struct {
 	userRepository *repositories.UserRepository
 }

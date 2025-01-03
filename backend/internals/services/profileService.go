@@ -1,59 +1,56 @@
 package services
 
 import (
+	"github.com/iacopoghilardi/mydget-backend/internals/mappers"
 	"github.com/iacopoghilardi/mydget-backend/internals/models"
+	"github.com/iacopoghilardi/mydget-backend/internals/repositories"
 	"github.com/iacopoghilardi/mydget-backend/internals/types/dto"
-	"gorm.io/gorm"
 )
 
 type ProfileService struct {
-	db *gorm.DB
+	profileRepository *repositories.ProfileRepository
 }
 
-func NewProfileService(db *gorm.DB) *ProfileService {
-	return &ProfileService{db}
+func NewProfileService(profileRepository *repositories.ProfileRepository) *ProfileService {
+	return &ProfileService{profileRepository: profileRepository}
 }
 
 func (s *ProfileService) GetProfile(id uint) (*models.Profile, error) {
-	var profile models.Profile
-	if err := s.db.Where("id = ?", id).First(&profile).Error; err != nil {
+	profile, err := s.profileRepository.FindById(id)
+	if err != nil {
 		return nil, err
 	}
-	return &profile, nil
+	return profile, nil
 }
 
-func (s *ProfileService) CreateProfile(dto dto.CreateProfileDto) (*models.Profile, error) {
+func (s *ProfileService) Create(dto dto.CreateProfileDto) (*models.Profile, error) {
+	profile := mappers.GetProfileModelFromCreateProfileDto(&dto)
+
+	createdProfile, err := s.profileRepository.Create(&profile)
+	if err != nil {
+		return nil, err
+	}
+	return createdProfile, nil
+}
+
+func (s *ProfileService) UpdateProfile(dto dto.UpdateProfileDto) (*models.Profile, error) {
+	oldProfile, err := s.profileRepository.FindById(dto.ID)
+	if err != nil {
+		return nil, err
+	}
+
 	profile := models.Profile{
 		FirstName: dto.FirstName,
 		LastName:  dto.LastName,
 		BirthDate: dto.BirthDate,
 		Avatar:    dto.Avatar,
 		Bio:       dto.Bio,
-		UserID:    dto.UserID,
 	}
 
-	if err := s.db.Create(&profile).Error; err != nil {
+	updatedProfile, err := s.profileRepository.Update(oldProfile, &profile)
+	if err != nil {
 		return nil, err
 	}
 
-	return &profile, nil
-}
-
-func (s *ProfileService) UpdateProfile(dto dto.UpdateProfileDto) (*models.Profile, error) {
-	var profile models.Profile
-	if err := s.db.Where("id = ?", dto.ID).First(&profile).Error; err != nil {
-		return nil, err
-	}
-
-	profile.FirstName = dto.FirstName
-	profile.LastName = dto.LastName
-	profile.BirthDate = dto.BirthDate
-	profile.Avatar = dto.Avatar
-	profile.Bio = dto.Bio
-
-	if err := s.db.Save(&profile).Error; err != nil {
-		return nil, err
-	}
-
-	return &profile, nil
+	return updatedProfile, nil
 }
