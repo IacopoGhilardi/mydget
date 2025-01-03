@@ -14,7 +14,7 @@ func NewUserRepository(db *gorm.DB) *UserRepository {
 	return &UserRepository{db: db}
 }
 
-func (r *UserRepository) CreateUser(user *models.User) (*models.User, error) {
+func (r *UserRepository) Create(user *models.User) (*models.User, error) {
 	err := r.db.Create(user).Error
 	if err != nil {
 		return nil, err
@@ -40,7 +40,7 @@ func (r *UserRepository) FindByEmail(email string) (*models.User, error) {
 	return &user, nil
 }
 
-func (r *UserRepository) FindById(id int) (*models.User, error) {
+func (r *UserRepository) FindById(id uint) (*models.User, error) {
 	var user models.User
 	err := r.db.First(&user, id).Error
 	if err != nil {
@@ -82,7 +82,7 @@ func (r *UserRepository) Update(oldUser *models.User, user *models.User) (*model
 	return oldUser, nil
 }
 
-func (r *UserRepository) Delete(id int) error {
+func (r *UserRepository) Delete(id uint) error {
 	err := r.db.Delete(&models.User{}, id).Error
 	if err != nil {
 		return err

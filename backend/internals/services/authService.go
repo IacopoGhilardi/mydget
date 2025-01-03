@@ -21,7 +21,7 @@ func NewAuthService(userRepository *repositories.UserRepository) *AuthService {
 func (a *AuthService) Register(user *dto.RegisterUserDto) (*models.User, error) {
 	userModel := mappers.RegisterUserDtoToUserModel(user)
 
-	createdUser, err := a.userRepository.CreateUser(&userModel)
+	createdUser, err := a.userRepository.Create(&userModel)
 	if err != nil {
 		return nil, err
 	}
