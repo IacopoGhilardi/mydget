@@ -29,6 +29,7 @@ func (s *ProfileService) CreateProfile(dto dto.CreateProfileDto) (*models.Profil
 		BirthDate: dto.BirthDate,
 		Avatar:    dto.Avatar,
 		Bio:       dto.Bio,
+		UserID:    dto.UserID,
 	}
 
 	if err := s.db.Create(&profile).Error; err != nil {
