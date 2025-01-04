@@ -73,7 +73,7 @@ func (h *UserHandler) GetById(c *gin.Context) {
 		))
 		return
 	}
-	user, err := h.userService.GetById(id)
+	user, err := h.userService.GetById(uint(id))
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, utils.BuildErrorResponse(
 			"Internal Server Error",
@@ -137,7 +137,7 @@ func (h *UserHandler) Delete(c *gin.Context) {
 		))
 		return
 	}
-	err = h.userService.Delete(id)
+	err = h.userService.Delete(uint(id))
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
